@@ -10,8 +10,8 @@ Item {
     // ------------------------------------------------------------------
     // 辅助配置
     // ------------------------------------------------------------------
-    readonly property int typeJointMove: 8
-    readonly property int typeLinearMove: 9
+    readonly property int typeJointMove: 4
+    readonly property int typeLinearMove: 5
 
     property var presetButtons: [
         { label: qsTr("🏠 原位 (Home)"), type: 0, color: "#10b981" },
@@ -199,11 +199,15 @@ Item {
                             text: qsTr("单步运行 (ID)")
                             Layout.alignment: Qt.AlignBottom
                             onClicked: {
-                                var pid = inputProjectId.inputValue.trim()
-                                var data = {}
-                                if(pid) data["id"] = pid // 只有第一次需要传ID，后续暂停不需要，这里简化逻辑全传
-                                var jsonString = JSON.stringify(dataObj)
-                                RobotGlobal.sendJsonRequest("project/runStep", jsonString)
+                                if (inputProjectId.inputValue.trim() !== null){
+                                    var pid = inputProjectId.inputValue.trim()
+                                    var data = {}
+                                    if(pid) data["id"] = pid // 只有第一次需要传ID，后续暂停不需要，这里简化逻辑全传
+                                    var jsonString = JSON.stringify(dataObj)
+                                    RobotGlobal.sendJsonRequest("project/runStep", jsonString)
+                                }else{
+                                    showError(qsTr("请输入工程ID"))
+                                }
                             }
                         }
 
@@ -361,7 +365,7 @@ Item {
                                    if (isNaN(val)) val = 0.0
                                    jointArr.push(val)
                                }
-                               RobotGlobal.sendJsonRequest(typeJointMove, JSON.stringify({"joint": jointArr}))
+                               RobotGlobal.sendRunTo(typeJointMove, {"jp":jointArr})
                            }
                        }
                    }
@@ -439,14 +443,14 @@ Item {
                             background: Rectangle { color: parent.down ? "#047857" : "#059669"; radius: 6 }
                             contentItem: Text { text: parent.text; color: "white"; font.bold: true; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                             onClicked: {
-                                var keys = ["x", "y", "z", "a", "b", "c"]
-                                var endObj = {}
+
+                            var endArray = []
                                 for(var i=0; i<linearRepeater.count; i++) {
                                     var val = parseFloat(linearRepeater.itemAt(i).inputValue)
                                     if (isNaN(val)) val = 0.0
-                                    endObj[keys[i]] = val
+                                    endArray.push(val)
                                 }
-                                RobotGlobal.sendRunTo(typeLinearMove, endObj)
+                                RobotGlobal.sendRunTo(typeLinearMove, {"cp":endArray})
                             }
                         }
                     }
@@ -589,5 +593,23 @@ Item {
             }
             validator: enableValidator ? (customValidator !== null ? customValidator : defaultValidator) : null
         }
+    }
+
+    function showError(msg) {
+            // console.error("[Error] " + msg)
+            // 如果你的主界面有全局弹窗接口，请调用它
+            // 如果没有，可以临时在这里加一个 MessageDialog
+            errorDialog.text = msg
+            errorDialog.open()
+        }
+
+    // 在 PageVariable 底部添加一个简单的弹窗
+    Dialog {
+        id: errorDialog
+        property alias text: msgLabel.text
+        anchors.centerIn: parent
+        modal: true
+        standardButtons: Dialog.Ok
+        contentItem: Label { id: msgLabel; color: "red" }
     }
 }

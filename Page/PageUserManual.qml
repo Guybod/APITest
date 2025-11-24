@@ -35,7 +35,7 @@ Item {
             title: "机器人脚本指南";
             desc: "机器人脚本编程语法参考";
             icon: "📜";
-            url: "https://www.lua.org/manual/5.3/"
+            url: "https://www.kdocs.cn/l/cqkkkry8u4Tg"
         }
         ListElement {
             title: "SDK 下载 (Gitee)";
@@ -50,18 +50,6 @@ Item {
             url: "https://github.com/Guybod/CodroidApi.git"
         }
         ListElement {
-            title: "SGS使用手册中文版";
-            desc: "SGS使用手册中文版";
-            icon: "📚";
-            url: "http://117.72.74.16/mypdfs/SGS_CN20250506.pdf"
-        }
-        ListElement {
-            title: "SGS使用手册英文版";
-            desc: "SGS使用手册英文版";
-            icon: "📚"; // 代表 Gitee 红色
-            url: "http://117.72.74.16/mypdfs/SGS_EN20250506.pdf"
-        }
-        ListElement {
             title: "常见问题 (FAQ)";
             desc: "故障排除与解决方案";
             icon: "❓";
@@ -72,18 +60,6 @@ Item {
     // 本地手册数据 (文件名需对应 resources 目录下的文件)
     ListModel {
         id: localDocsModel
-        ListElement {
-            title: "SGS使用手册中文版";
-            desc: "Quick Start Guide.pdf";
-            icon: "🚀";
-            fileName: "SGS_CN20250506.pdf"
-        }
-        ListElement {
-            title: "SGS使用手册英文版";
-            desc: "Quick Start Guide.pdf";
-            icon: "🚀";
-            fileName: "SGS_EN20250506.pdf"
-        }
     }
 
     // ------------------------------------------------------------------

@@ -209,11 +209,11 @@ Item {
                         value: robotData.defaultToolId || "-"
                     }
                     InfoItem {
-                        label: qsTr("默认工具")
+                        label: qsTr("默认负载")
                         value: robotData.defaultPayloadId || "-"
                     }
                     InfoItem {
-                        label: qsTr("默认工具")
+                        label: qsTr("默认坐标系")
                         value: robotData.defaultCoordinateId || "-"
                     }
 
@@ -224,17 +224,17 @@ Item {
                     }
                     InfoItem {
                         label: qsTr("救援模式")
-                        value: robotData.rescueFlag === 0 ? qsTr("是") : qsTr("否")
+                        value: robotData.rescueFlag ? qsTr("是") : qsTr("否")
                         valueColor: "#f59e0b"
                     }
                     InfoItem {
-                        label: qsTr("仿真模式")
-                        value: robotData.isSimulation ? qsTr("是") : qsTr("否")
+                        label: qsTr("传送带状态")
+                        value: robotData.recoveryState || "-"
                         valueColor: "#f59e0b"
                     }
                     InfoItem {
                         label: qsTr("使用示教器")
-                        value: robotData.teachingPendant === 0 ? qsTr("是") : qsTr("否")
+                        value: robotData.teachingPendant ? qsTr("是") : qsTr("否")
                         valueColor: "#f59e0b"
                     }
                     InfoItem {
@@ -260,10 +260,29 @@ Item {
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 15
-
                     // 关节角度
-                    Text { text: qsTr("关节角度 (J1 - J6):"); font.bold: true; color: "#6b7280" }
+                    RowLayout {
+                        Text { text: qsTr("关节角度 (J1 - J6):"); font.bold: true; color: "#6b7280" }
+                        CustomButton {
+                            defaultColor: "#f3f4f6"
+                            buttonText: "复制"
+                            // 按钮稍微小一点，适应行高
+                            Layout.preferredHeight: 24
+                            onClicked: {
+                                // 1. 获取数据，防止为空
+                                var rawData = postureData.joint || [0,0,0,0,0,0];
 
+                                // 2. 格式化数据：保留3位小数，并转回 Number 类型以去除多余的0，
+                                // 这样生成的 JSON 不会是字符串数组 ["10.000"] 而是数字数组 [10, 20.5]
+                                var formattedData = rawData.map(function(val){
+                                    return Number(Number(val).toFixed(3));
+                                });
+
+                                // 3. 转为字符串数组形式 "[...]" 并复制
+                                clipboardHelper.copyText(JSON.stringify(formattedData));
+                            }
+                        }
+                    }
                     RowLayout {
                         Layout.fillWidth: true
                         spacing: 10
@@ -302,7 +321,27 @@ Item {
                     }
 
                     // 末端位姿
-                    Text { text: qsTr("末端坐标 (XYZABC):"); font.bold: true; color: "#6b7280" }
+                    RowLayout {
+                        Text { text: qsTr("末端坐标 (XYZABC):"); font.bold: true; color: "#6b7280" }
+                        CustomButton {
+                            defaultColor: "#f3f4f6"
+                            buttonText: "复制"
+                            Layout.preferredHeight: 24
+                            onClicked: {
+                                // 1. 提取对象中的值，按 X,Y,Z,A,B,C 顺序组成数组
+                                var e = postureData.end || {};
+                                var rawArr = [e.x, e.y, e.z, e.a, e.b, e.c];
+
+                                // 2. 格式化为保留3位小数的数字
+                                var formattedData = rawArr.map(function(val){
+                                    return Number(Number(val || 0).toFixed(3));
+                                });
+
+                                // 3. 复制为 [10.0, 20.0, ...] 格式
+                                clipboardHelper.copyText(JSON.stringify(formattedData));
+                            }
+                        }
+                    }
                     RowLayout {
                         Layout.fillWidth: true
                         spacing: 10
@@ -754,6 +793,21 @@ Item {
         id: timerInit
         interval: 2000 // 2秒后才允许弹窗
         onTriggered: isInitialized = true
+    }
+
+    // --- 辅助组件：用于实现复制功能 ---
+    TextEdit {
+        id: clipboardHelper
+        visible: false // 隐藏不可见
+        text: ""
+
+        function copyText(dataStr) {
+            text = dataStr
+            selectAll()
+            copy()
+            // 可选：在这里调用一个 Toast 提示用户复制成功
+            console.log("已复制到剪贴板: " + text)
+        }
     }
 
 }

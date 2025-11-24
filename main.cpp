@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("Tool", "Main");
+    engine.loadFromModule("CodroidAPITestTool", "Main");
 
     return app.exec();
 }

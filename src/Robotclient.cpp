@@ -274,6 +274,13 @@ void RobotClient::sendRunTo(int moveType, const QJsonObject &targetJson)
         dbObj["target"] = targetJson;
     }
 
+    // --- [新增] 打印 dbObj 内容 ---
+    // QJsonDocument::Compact 表示压缩格式（一行显示），如果想换行显示可以用 QJsonDocument::Indented
+    QJsonDocument doc(dbObj);
+    QString jsonString(doc.toJson(QJsonDocument::Compact));
+    writeLog(QString(">>> RunTo 数据包内容: %1").arg(jsonString));
+
+
     // 2. 发送请求
     writeLog(QString(">>> 启动 RunTo (Type: %1)").arg(moveType));
     sendJsonRequest("Robot/moveTo", dbObj);
