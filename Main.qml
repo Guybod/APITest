@@ -152,7 +152,7 @@ ApplicationWindow {
 
                 // 1.3 底部版本号 (装饰)
                 Text {
-                    text: "v1.0.2"
+                    text: "v2.0.1"
                     color: "#9ca3af"
                     font.pixelSize: 12
                     Layout.alignment: Qt.AlignHCenter
